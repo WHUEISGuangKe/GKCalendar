@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context="com.example.administrator.timemanageapp.MainActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/blue"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/btnback"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="返回"
+            android:background="@color/blue"
+            android:textColor="@color/white"/>
+
+        <TextView
+            android:id="@+id/tvdate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="2016-04-15"
+            android:textColor="#ffffff" />
+
+        <Button
+            android:id="@+id/btnsave"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@color/blue"
+            android:textColor="@color/white"
+            android:text="保存" />
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#6600BFFF"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/tvtime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="00:00"
+            android:width="100dp"
+            android:textColor="#ffffff" />
+
+        <Button
+            android:id="@+id/btnclock"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="设定闹钟"
+            />
+    </LinearLayout>
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#2287CEEB"
+        android:gravity="top"
+        android:hint="此处添加事件"
+        android:id="@+id/editText"/>
+
+</LinearLayout>
