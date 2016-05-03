@@ -33,6 +33,7 @@ public class CalendarInfoDao {
         value.put("isImportent", info.isImportent);
         value.put("calendar", info.calendar);
         value.put("unix_time", info.unix_time);
+        //value.put("ring",info.ring1.toString());
 
         long result = db.insert("calendar_info", null, value);
 

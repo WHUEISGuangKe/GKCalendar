@@ -18,6 +18,10 @@ public class AlarmUtil { // 闹钟管理工具类
         Intent intent = new Intent("android.alarm.action");
         intent.putExtra("content", info.calendar);
         intent.putExtra("_id", info._id + "");
+        if(info.ring1!=null)
+            intent.putExtra("ring",info.ring1.toString());
+        else
+            intent.putExtra("ring","");
 //        Intent intent = new Intent(context, com.whu.gkcalendar.activity.Calendar.class);
         PendingIntent pendingIntent = PendingIntent.getBroadcast(context, info._id, intent, 0);
 
@@ -27,7 +31,7 @@ public class AlarmUtil { // 闹钟管理工具类
         calendar.setTimeInMillis(timestamp);
 
         AlarmManager alarmManager = (AlarmManager) context.getApplicationContext().getSystemService(Context.ALARM_SERVICE);
-        alarmManager.set(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pendingIntent);
+        alarmManager.set(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),pendingIntent);
         System.out.println(calendar.getTimeInMillis());
         Toast.makeText(context, "闹钟设置成功！:", Toast.LENGTH_SHORT).show();
     }

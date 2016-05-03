@@ -79,12 +79,12 @@ public class EditActivity extends Activity implements View.OnClickListener {
         btnSave = (Button) findViewById(R.id.btnsave);
         editText = (TextView) findViewById(R.id.editText);
 
-        btnClock.setVisibility(View.INVISIBLE);
+        //btnClock.setVisibility(View.INVISIBLE);
         btnSave.setOnClickListener(this);
         btnBack.setOnClickListener(this);
         tvDate.setOnClickListener(this);
         tvTime.setOnClickListener(this);
-//        btnClock.setOnClickListener(this);
+        btnClock.setOnClickListener(this);
 
         tvDate.setText(TimeUtil.getTodayString());
         Intent intent = getIntent();
@@ -105,8 +105,10 @@ public class EditActivity extends Activity implements View.OnClickListener {
                 new DatePickerDialog(EditActivity.this, new DatePickerDialog.OnDateSetListener() {
                     @Override
                     public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
-                        String string = String.format("%d-%d-%d", year, monthOfYear + 1, dayOfMonth);
-                        tvDate.setText(string);
+                        String monthStr = monthOfYear + 1 < 10 ? "0" + (monthOfYear + 1) : 1 + monthOfYear + "";
+                        String dayStr = dayOfMonth < 10 ? "0" + dayOfMonth : "" +dayOfMonth;
+//                        String string = String.format("%d-%d-%d", year, monthOfYear + 1, dayOfMonth);
+                        tvDate.setText(year + "-" + monthStr + "-" + dayStr);
                     }
                 }, TimeUtil.getYear(), TimeUtil.getMonth() - 1, TimeUtil.getDay_month()).show();
                 break;
@@ -114,8 +116,10 @@ public class EditActivity extends Activity implements View.OnClickListener {
                 new TimePickerDialog(EditActivity.this, new TimePickerDialog.OnTimeSetListener() {
                     @Override
                     public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-                        String string = String.format("%d:%d", hourOfDay, minute);
-                        tvTime.setText(string);
+                        String minStr = hourOfDay < 10 ? "0" + hourOfDay : "" + hourOfDay;
+                        String secStr = minute < 10 ? "0" + minute : "" +minute;
+//                        String string = String.format("%2d:%2d", hourOfDay, minute);
+                        tvTime.setText(minStr + ":" + secStr);
                     }
                 }, 00, 00, true).show();
                 break;
@@ -149,13 +153,17 @@ public class EditActivity extends Activity implements View.OnClickListener {
                     String str = queryInfo.unix_time + queryInfo.calendar;
                     if (str.equals(token)) {
 //                        System.out.println("idTest2:" + str);
-                        Toast.makeText(mContext, "你已有该日程", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(mContext, "已有该日程", Toast.LENGTH_SHORT).show();
                         break;
                     }
                 }
-                setResult(RESULT_OK, new Intent());
+
                 dao.add(info);
+                //添加注册闹钟
+                info.ring1=CalendarInfo.ring;
                 AlarmUtil.registerAlarm(mContext, info);
+                CalendarInfo.ring=null;
+                setResult(RESULT_OK, new Intent());
                 finish();
                 break;
 
@@ -173,6 +181,7 @@ public class EditActivity extends Activity implements View.OnClickListener {
         switch (requestCode) {
             case REQUEST_CODE_PICK_RINGTONE: {
                 Uri pickedUri = data.getParcelableExtra(RingtoneManager.EXTRA_RINGTONE_PICKED_URI);
+                CalendarInfo.ring=pickedUri;
                 handleRingtonePicked(pickedUri);
                 break;
             }
@@ -191,8 +200,7 @@ public class EditActivity extends Activity implements View.OnClickListener {
         // Allow user to pick 'Default'
         intent.putExtra(RingtoneManager.EXTRA_RINGTONE_SHOW_DEFAULT, true);
         // Show only ringtones
-        intent.putExtra(RingtoneManager.EXTRA_RINGTONE_TYPE,
-                RingtoneManager.TYPE_RINGTONE);
+        intent.putExtra(RingtoneManager.EXTRA_RINGTONE_TYPE,RingtoneManager.TYPE_RINGTONE);
         // Don't show 'Silent'
         intent.putExtra(RingtoneManager.EXTRA_RINGTONE_SHOW_SILENT, true);
 
