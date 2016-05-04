@@ -31,9 +31,10 @@ public class AlarmUtil { // 闹钟管理工具类
         calendar.setTimeInMillis(timestamp);
 
         AlarmManager alarmManager = (AlarmManager) context.getApplicationContext().getSystemService(Context.ALARM_SERVICE);
-        alarmManager.set(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),pendingIntent);
+        alarmManager.set(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pendingIntent);
         System.out.println(calendar.getTimeInMillis());
-        Toast.makeText(context, "闹钟设置成功！:", Toast.LENGTH_SHORT).show();
+        if(CalendarInfo.ring!=null)
+             Toast.makeText(context, "闹钟设置成功！", Toast.LENGTH_SHORT).show();
     }
 
     public static void cancelAlarm(Context context, int _id){

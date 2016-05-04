@@ -9,8 +9,11 @@
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="进入"
+        android:text="开始"
         android:id="@+id/btnStart"
+        android:layout_marginBottom="38dp"
         android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true" />
+        android:layout_centerHorizontal="true"
+        android:backgroundTint="#3320B2AA"
+        android:textColor="#cc98FB98"/>
 </RelativeLayout>
