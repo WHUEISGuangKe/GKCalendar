@@ -14,7 +14,8 @@ public class CalendarInfo {
     public String week_day; // 周几
     public String time; // 时-分
     public String calendar;
-    public int isImportent; // 1:重要 0：不重要
+    //修改重要性
+    public int isImportent; // 0：琐事 1：紧急不重要 2：重要不紧急 3：紧急重要
     public int unix_time;
     public int _id;
     public static Uri ring= null;//铃声中间变量

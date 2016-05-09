@@ -11,6 +11,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.DatePicker;
 import android.widget.TextView;
 import android.widget.TimePicker;
@@ -35,6 +36,7 @@ public class EditActivity extends Activity implements View.OnClickListener {
     //保存铃声的Uri的字符串形式
     private String mRingtoneUri = null;
     private Context mContext = this;
+    private CheckBox cbImpo,cbUrge;
 
     private int handleDate() {
         String dateString = tvDate.getText() + "#" + tvTime.getText();
@@ -61,10 +63,9 @@ public class EditActivity extends Activity implements View.OnClickListener {
         }
         info.date = date;
         info.week_day = dates[2];
-        info.isImportent = 0;
         info.time = tvTime.getText().toString();
         info.calendar = editText.getText().toString().trim();
-        info._id = timestamp + info.calendar.hashCode();
+        info._id = timestamp + info.calendar.hashCode()+info.isImportent;
         return info;
     }
 
@@ -78,6 +79,8 @@ public class EditActivity extends Activity implements View.OnClickListener {
         btnBack = (Button) findViewById(R.id.btnback);
         btnSave = (Button) findViewById(R.id.btnsave);
         editText = (TextView) findViewById(R.id.editText);
+        cbImpo = (CheckBox)findViewById(R.id.checkboxImpor);
+        cbUrge = (CheckBox)findViewById(R.id.checkboxUrge);
 
         //btnClock.setVisibility(View.INVISIBLE);
         btnSave.setOnClickListener(this);
@@ -92,6 +95,16 @@ public class EditActivity extends Activity implements View.OnClickListener {
             editText.setText(intent.getBundleExtra("editData").getString("calendar"));
             tvDate.setText(intent.getBundleExtra("editData").getString("date"));
             tvTime.setText(intent.getBundleExtra("editData").getString("time"));
+            int i=intent.getBundleExtra("editData").getInt("isImpor");
+           // Log.d("EditActivity........",String.format("%d",i));
+            if(i==1)
+                cbUrge.setChecked(true);
+            if(i==2)
+                cbImpo.setChecked(true);
+            if(i==3) {
+                cbImpo.setChecked(true);
+                cbUrge.setChecked(true);
+            }
         }
 
         dao = new CalendarInfoDao(mContext);
@@ -135,22 +148,29 @@ public class EditActivity extends Activity implements View.OnClickListener {
             case R.id.btnsave:
                 CalendarInfo info = new CalendarInfo();
                 CalendarInfo queryInfo = null;
-
                 int timestamp = handleDate();
+                if(cbImpo.isChecked()&&cbUrge.isChecked())
+                    info.isImportent=3;
+                else if(!cbImpo.isChecked()&&cbUrge.isChecked())
+                    info.isImportent=1;
+                else if(cbImpo.isChecked()&&!cbUrge.isChecked())
+                    info.isImportent=2;
+                else
+                    info.isImportent=0;
                 info = capsulation(info, timestamp);
                 int currentTimestamp = (int) (System.currentTimeMillis() / 1000);
 //                System.out.println(currentTimestamp +"~~~~~~~~~~~~~~"+info.unix_time);
                 if (info.unix_time <= currentTimestamp) {
-                    Toast.makeText(mContext, "日程已过时！", Toast.LENGTH_LONG).show();
+                    Toast.makeText(mContext, "日程已过时", Toast.LENGTH_LONG).show();
                     break;
                 }
                 //
-                String token = info.unix_time + info.calendar;
+                String token = info.unix_time + info.calendar+info.isImportent;
                 String nowId = info.unix_time + info.calendar.hashCode() + "";
                 queryInfo = dao.queryWithID(nowId);
 //                System.out.println(token + "---" + (info.unix_time + info.calendar.hashCode()));
                 if (queryInfo != null) {
-                    String str = queryInfo.unix_time + queryInfo.calendar;
+                    String str = queryInfo.unix_time + queryInfo.calendar + queryInfo.isImportent;
                     if (str.equals(token)) {
 //                        System.out.println("idTest2:" + str);
                         Toast.makeText(mContext, "已有该日程", Toast.LENGTH_SHORT).show();

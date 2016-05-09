@@ -116,7 +116,7 @@ public class CalendarInfoDao {
         return  bean;
     }
 
-    public ArrayList<CalendarInfo> query(String now_unix) {
+    public ArrayList<CalendarInfo> query(String now_unix,int imporDegree) {//根据重要性提取列表
 
         ArrayList<CalendarInfo> list = new ArrayList<CalendarInfo>();
 
@@ -135,18 +135,19 @@ public class CalendarInfoDao {
             while (cursor.moveToNext()) {//条件，游标能否定位到下一行
                 CalendarInfo bean = new CalendarInfo();
                 //获取数据
-                bean._id = cursor.getInt(0);
-                bean.year = cursor.getInt(1);
-                bean.date = cursor.getString(2);
-                bean.week_day = cursor.getString(3);
-                bean.time = cursor.getString(4);
-                bean.isImportent = cursor.getInt(5);
-                bean.calendar = cursor.getString(6);
-                bean.unix_time = cursor.getInt(7);
-                list.add(bean);
+                    bean._id = cursor.getInt(0);
+                    bean.year = cursor.getInt(1);
+                    bean.date = cursor.getString(2);
+                    bean.week_day = cursor.getString(3);
+                    bean.time = cursor.getString(4);
+                    bean.isImportent = cursor.getInt(5);
+                    bean.calendar = cursor.getString(6);
+                    bean.unix_time = cursor.getInt(7);
+                if(bean.isImportent==imporDegree||imporDegree==-1) {
+                    list.add(bean);
+                }
             }
             cursor.close();//关闭结果集
-
         }
         //关闭数据库对象
         db.close();

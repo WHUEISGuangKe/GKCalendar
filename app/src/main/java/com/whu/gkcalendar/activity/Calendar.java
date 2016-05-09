@@ -6,14 +6,18 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.baoyz.actionsheet.ActionSheet;
@@ -28,14 +32,22 @@ import com.whu.gkcalendar.dao.CalendarInfoDao;
 import com.whu.gkcalendar.util.AlarmUtil;
 import com.whu.gkcalendar.util.TimeUtil;
 
+import java.util.ArrayList;
 import java.util.List;
 
-public class Calendar extends AppCompatActivity implements ActionSheet.ActionSheetListener, AdapterView.OnItemClickListener {
+public class Calendar extends AppCompatActivity implements ActionSheet.ActionSheetListener, AdapterView.OnItemClickListener{
     private Context mContext = this;
     private CalendarInfoDao dao = null;
     private List<CalendarInfo> infoList = null;
     private static int position = -1;
     private SwipeMenuListView listView = null;
+    private SwipeMenuListView calendarList;
+
+    //选择事件类型
+    private DrawerLayout drawerLayout;
+    private ListView drawerList;
+    private ArrayList<String> menuList;
+    private ArrayAdapter<String> arrayAdapter;
 
     @Override
     protected void onResume() {
@@ -63,6 +75,20 @@ public class Calendar extends AppCompatActivity implements ActionSheet.ActionShe
             }
         }
         setContentView(R.layout.activity_calendar);
+
+        drawerLayout=(DrawerLayout)findViewById(R.id.drawerLayout);
+        drawerList=(ListView)findViewById(R.id.drawerList);
+        menuList=new ArrayList<String>();
+        //左侧菜单栏的配置
+        menuList.add("全部");
+        menuList.add("重要紧急");
+        menuList.add("重要不紧急");
+        menuList.add("紧急不重要");
+        menuList.add("琐事");
+        arrayAdapter=new ArrayAdapter<String>(this,android.R.layout.simple_list_item_1,menuList);
+        drawerList.setAdapter(arrayAdapter);
+        drawerList.setOnItemClickListener(this);
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         toolbar.setTitle("");
         Button addBtn = (Button) toolbar.findViewById(R.id.addBtn);
@@ -79,11 +105,11 @@ public class Calendar extends AppCompatActivity implements ActionSheet.ActionShe
 //        testDB(dao);
         int timestamp = (int) (System.currentTimeMillis() / 1000) - 5;
 //        System.out.println("timestamp：~~~"+timestamp);
-        List list = dao.query(timestamp + ""); // test
+        List list = dao.query(timestamp + "",-1); // test
         infoList = list;
 
 //        testQuery(dao);
-        SwipeMenuListView calendarList = (SwipeMenuListView) findViewById(R.id.calendar_list);
+        calendarList = (SwipeMenuListView) findViewById(R.id.calendar_list);
         CalendarAdapter calendarAdapter = new CalendarAdapter(mContext, list);
         calendarList.setAdapter(calendarAdapter);
 
@@ -188,7 +214,7 @@ public class Calendar extends AppCompatActivity implements ActionSheet.ActionShe
     }
 
     private void testQuery(CalendarInfoDao dao) {
-        List<CalendarInfo> list = dao.query("1460440800");
+        List<CalendarInfo> list = dao.query("1460440800",-1);
 
         for (CalendarInfo info : list) {
             System.out.println(info.calendar);
@@ -197,18 +223,27 @@ public class Calendar extends AppCompatActivity implements ActionSheet.ActionShe
 
     private void refreshData(){
         int timestamp = (int) (System.currentTimeMillis() / 1000) - 5;
-        infoList = dao.query("" + timestamp);
+        infoList = dao.query("" + timestamp,-1);
         CalendarAdapter adapter = new CalendarAdapter(mContext, infoList);
         listView.setAdapter(adapter);
     }
+    private void divide(int imporDegree){
+        int timestamp = (int) (System.currentTimeMillis() / 1000) - 5;
+        infoList = dao.query("" + timestamp,imporDegree);
+        CalendarAdapter adapter = new CalendarAdapter(mContext, infoList);
+        listView.setAdapter(adapter);
+    }
+
     private void editData(CalendarInfo info){
         Intent intent=new Intent(mContext,EditActivity.class);
         String strCalendar=info.calendar,strDate=info.date,strTime=info.time,strYear=String.valueOf(info.year);
+        int isImpor=info.isImportent;
         Bundle bundle=new Bundle();
         bundle.putString("calendar",strCalendar);
        // bundle.putString("year",strYear);
         bundle.putString("date",strYear+"-"+strDate);
         bundle.putString("time",strTime);
+        bundle.putInt("isImpor",isImpor);
         intent.putExtra("editData", bundle);
         startActivityForResult(intent, 1);
     }
@@ -222,7 +257,6 @@ public class Calendar extends AppCompatActivity implements ActionSheet.ActionShe
             case 1:
                 if(resultCode==RESULT_OK) {
                     CalendarInfo info = infoList.get(position);
-
                     dao.delete(info);
                     AlarmUtil.cancelAlarm(mContext, info._id);
                 }
@@ -242,8 +276,8 @@ public class Calendar extends AppCompatActivity implements ActionSheet.ActionShe
             case 0: // 编辑
                 editData(info);
                 break;
-            case 1: // 标为重要
-                info.isImportent = 1;
+            case 1: // 标为紧急重要
+                info.isImportent = 3;
                 dao.update("isImportent", info);
                 refreshData();
                 break;
@@ -260,12 +294,41 @@ public class Calendar extends AppCompatActivity implements ActionSheet.ActionShe
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        this.position = position;
-        ActionSheet.createBuilder(this, getSupportFragmentManager())
-                .setCancelButtonTitle("取消")
-                .setOtherButtonTitles("编辑","标为重要","推后一天","设为已结束")
-                .setCancelableOnTouchOutside(true)
-                .setListener(this).show();
+
+        int importDegree=0;
+        if (parent==calendarList) {
+            this.position = position;
+            ActionSheet.createBuilder(this, getSupportFragmentManager())
+                    .setCancelButtonTitle("取消")
+                    .setOtherButtonTitles("编辑", "标为紧急重要", "推后一天", "设为已结束")
+                    .setCancelableOnTouchOutside(true)
+                    .setListener(this).show();
+        }
+        else if (parent == drawerList) {
+            switch (position){
+                case 0://全部
+                    importDegree=0;
+                    divide(-1);
+                    break;
+                case 1://重要紧急
+                    divide(3);
+                    break;
+                case 2://重要
+                    divide(2);
+                    break;
+                case 3://紧急
+                    divide(1);
+                    break;
+                case 4://琐事
+                    divide(0);
+                    break;
+                default:
+                    break;
+            }
+
+            drawerLayout.closeDrawer(drawerList);
+        }
+
     }
 
 }

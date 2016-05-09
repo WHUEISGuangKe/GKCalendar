@@ -1,6 +1,7 @@
 package com.whu.gkcalendar.adapter;
 
 import android.content.Context;
+import android.support.v4.content.ContextCompat;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
@@ -16,6 +17,8 @@ import com.whu.gkcalendar.util.TimeUtil;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
+
+import static com.whu.gkcalendar.R.color.blue;
 
 /**
  * Created by wwhisdavid on 16/4/12.
@@ -56,15 +59,13 @@ public class CalendarAdapter extends BaseAdapter {
             // 获取上一条记录
             lastBean = list.get(position - 1);
         }
-        if (lastBean != null){
+        if (lastBean != null) {
             lastBeanDate = lastBean.year + "-" + lastBean.date;
         }
-
 
         CalendarInfo bean = list.get(position);
 
         String calendarDate = bean.year + "-" + bean.date; // 获取当前记录的时间（天）
-
 
 
         if (lastBean == null || !lastBeanDate.equals(calendarDate)) {
@@ -87,9 +88,23 @@ public class CalendarAdapter extends BaseAdapter {
 
         time.setText(bean.time);
         content.setText(bean.calendar);
-        if (bean.isImportent == 1) {
-            importent.setText("*");
+        if (bean.isImportent == 1){
+            importent.setText("（紧急）");
+            importent.setTextColor(context.getResources().getColor(R.color.green));
         }
+
+        else if (bean.isImportent == 2) {
+            importent.setText("（重要）");
+            importent.setTextColor(context.getResources().getColor(R.color.yellow));
+        }
+        else if (bean.isImportent == 3)
+            importent.setText("(重要紧急）");
+        else {
+           // time.setVisibility(View.INVISIBLE);
+           // content.setVisibility(View.INVISIBLE);
+        }
+
+
         if (type >= 0) {
 
             TextView weekDay = (TextView) view.findViewById(R.id.week_day_text);
