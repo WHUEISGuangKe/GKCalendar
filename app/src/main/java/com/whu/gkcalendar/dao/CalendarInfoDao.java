@@ -32,7 +32,8 @@ public class CalendarInfoDao {
         value.put("time", info.time);
         value.put("isImportent", info.isImportent);
         value.put("calendar", info.calendar);
-        value.put("unix_time", info.unix_time);
+        value.put("unix_time", info.unix_time);;
+        value.put("ring",info.ring2);
         //value.put("ring",info.ring1.toString());
 
         long result = db.insert("calendar_info", null, value);
@@ -78,6 +79,9 @@ public class CalendarInfoDao {
         if (columnName.equals("weekday")){
             values.put(columnName, info.week_day);
         }
+        if(columnName.equals("ring")){
+            values.put(columnName,info.ring2);
+        }
 
         int result = db.update("calendar_info", values, "_id = ?", new String[]{info._id + ""});
         db.close();
@@ -89,7 +93,7 @@ public class CalendarInfoDao {
 
     public CalendarInfo queryWithID(String _id){
         SQLiteDatabase db = calendarSqliteOpenHalper.getReadableDatabase();
-        String[] fields = {"_id", "year", "date", "weekday", "time", "isImportent", "calendar", "unix_time"};
+        String[] fields = {"_id", "year", "date", "weekday", "time", "isImportent", "calendar", "unix_time","ring"};
         Cursor cursor = db.query("calendar_info", fields, "_id = ?", new String[]{_id}, null, null, "unix_time asc");
 
         CalendarInfo bean = null;
@@ -107,6 +111,7 @@ public class CalendarInfoDao {
                 bean.isImportent = cursor.getInt(5);
                 bean.calendar = cursor.getString(6);
                 bean.unix_time = cursor.getInt(7);
+                bean.ring2=cursor.getString(8);
             }
             cursor.close();//关闭结果集
 
@@ -126,7 +131,7 @@ public class CalendarInfoDao {
 
         //table:表名, columns：查询的列名,如果null代表查询所有列； selection:查询条件, selectionArgs：条件占位符的参数值,
         //groupBy:按什么字段分组, having:分组的条件, orderBy:按什么字段排序
-        String[] fields = {"_id", "year", "date", "weekday", "time", "isImportent", "calendar", "unix_time"};
+        String[] fields = {"_id", "year", "date", "weekday", "time", "isImportent", "calendar", "unix_time","ring"};
         Cursor cursor = db.query("calendar_info", fields, "unix_time > ?", new String[]{now_unix}, null, null, "unix_time asc");
         //解析Cursor中的数据
         if (cursor != null && cursor.getCount() > 0) {//判断cursor中是否存在数据
@@ -143,6 +148,7 @@ public class CalendarInfoDao {
                     bean.isImportent = cursor.getInt(5);
                     bean.calendar = cursor.getString(6);
                     bean.unix_time = cursor.getInt(7);
+                    bean.ring2=cursor.getString(8);
                 if(bean.isImportent==imporDegree||imporDegree==-1) {
                     list.add(bean);
                 }

@@ -37,12 +37,15 @@ public class AlarmUtil { // 闹钟管理工具类
              Toast.makeText(context, "闹钟设置成功！", Toast.LENGTH_SHORT).show();
     }
 
-    public static void cancelAlarm(Context context, int _id){
+    public static void cancelAlarm(Context context, int _id, String ring){
         AlarmManager alarmManager = (AlarmManager) context.getApplicationContext().getSystemService(Context.ALARM_SERVICE);
         Intent intent = new Intent("android.alarm.action");
 //        intent.setClass(context, AlarmReceiver.class);
         PendingIntent pendingIntent = PendingIntent.getBroadcast(context, _id, intent, 0);
         alarmManager.cancel(pendingIntent);
-        Toast.makeText(context, "闹钟取消成功！", Toast.LENGTH_SHORT).show();
+        if(ring.equals("")){}
+        else
+            Toast.makeText(context, "闹钟取消成功！", Toast.LENGTH_SHORT).show();
+
     }
 }

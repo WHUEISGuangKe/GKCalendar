@@ -9,6 +9,7 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.Gravity;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -16,6 +17,8 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -42,12 +45,18 @@ public class Calendar extends AppCompatActivity implements ActionSheet.ActionShe
     private static int position = -1;
     private SwipeMenuListView listView = null;
     private SwipeMenuListView calendarList;
+    private Button addBtn;
 
     //选择事件类型
+    private LinearLayout drawerLin;
     private DrawerLayout drawerLayout;
     private ListView drawerList;
     private ArrayList<String> menuList;
     private ArrayAdapter<String> arrayAdapter;
+    private Button btnMenu;
+
+    //登录按钮
+    private ImageView ivLogin;
 
     @Override
     protected void onResume() {
@@ -78,25 +87,43 @@ public class Calendar extends AppCompatActivity implements ActionSheet.ActionShe
 
         drawerLayout=(DrawerLayout)findViewById(R.id.drawerLayout);
         drawerList=(ListView)findViewById(R.id.drawerList);
+        drawerLin=(LinearLayout)findViewById(R.id.linearDrawer);
+        ivLogin=(ImageView)findViewById(R.id.iv_login);
         menuList=new ArrayList<String>();
         //左侧菜单栏的配置
-        menuList.add("全部");
+        menuList.add("全部事项");
         menuList.add("重要紧急");
         menuList.add("重要不紧急");
         menuList.add("紧急不重要");
-        menuList.add("琐事");
+        menuList.add("日常琐事");
+        menuList.add("公共备忘录");
         arrayAdapter=new ArrayAdapter<String>(this,android.R.layout.simple_list_item_1,menuList);
         drawerList.setAdapter(arrayAdapter);
         drawerList.setOnItemClickListener(this);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         toolbar.setTitle("");
-        Button addBtn = (Button) toolbar.findViewById(R.id.addBtn);
+        addBtn = (Button)findViewById(R.id.addBtn);
+        btnMenu=(Button)findViewById(R.id.menuBtn);
         addBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent go2Edit = new Intent(mContext, EditActivity.class);
                 mContext.startActivity(go2Edit);
+            }
+        });
+        btnMenu.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                drawerLayout.openDrawer(Gravity.LEFT);
+            }
+        });
+        ivLogin.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent goLogin=new Intent(mContext,LoginActivity.class);
+                startActivity(goLogin);
+
             }
         });
         setSupportActionBar(toolbar);
@@ -143,7 +170,7 @@ public class Calendar extends AppCompatActivity implements ActionSheet.ActionShe
             public boolean onMenuItemClick(int position, SwipeMenu menu, int index) {
                 CalendarInfo info = infoList.get(position);
                 dao.delete(info);
-                AlarmUtil.cancelAlarm(mContext, info._id);
+                AlarmUtil.cancelAlarm(mContext, info._id,info.ring2);
                 refreshData();
                 return false;
             }
@@ -190,7 +217,7 @@ public class Calendar extends AppCompatActivity implements ActionSheet.ActionShe
         dao.update("date", info);
         dao.update("unix_time", info);
         dao.update("weekday", info);
-        AlarmUtil.cancelAlarm(mContext, info._id);
+        AlarmUtil.cancelAlarm(mContext, info._id,info.ring2);
         AlarmUtil.registerAlarm(mContext, info);
         refreshData();
     }
@@ -241,8 +268,9 @@ public class Calendar extends AppCompatActivity implements ActionSheet.ActionShe
         Bundle bundle=new Bundle();
         bundle.putString("calendar",strCalendar);
        // bundle.putString("year",strYear);
-        bundle.putString("date",strYear+"-"+strDate);
-        bundle.putString("time",strTime);
+        bundle.putString("date", strYear + "-" + strDate);
+        bundle.putString("time", strTime);
+        bundle.putString("ring",info.ring2);
         bundle.putInt("isImpor",isImpor);
         intent.putExtra("editData", bundle);
         startActivityForResult(intent, 1);
@@ -258,7 +286,7 @@ public class Calendar extends AppCompatActivity implements ActionSheet.ActionShe
                 if(resultCode==RESULT_OK) {
                     CalendarInfo info = infoList.get(position);
                     dao.delete(info);
-                    AlarmUtil.cancelAlarm(mContext, info._id);
+                    AlarmUtil.cancelAlarm(mContext, info._id,info.ring2);
                 }
                 break;
         }
@@ -286,7 +314,7 @@ public class Calendar extends AppCompatActivity implements ActionSheet.ActionShe
                 break;
             case 3: // 设为已结束(暂定删除)
                 dao.delete(info);
-                AlarmUtil.cancelAlarm(mContext, info._id);
+                AlarmUtil.cancelAlarm(mContext, info._id,info.ring2);
                 refreshData();
                 break;
         }
@@ -326,7 +354,7 @@ public class Calendar extends AppCompatActivity implements ActionSheet.ActionShe
                     break;
             }
 
-            drawerLayout.closeDrawer(drawerList);
+            drawerLayout.closeDrawer(Gravity.LEFT);
         }
 
     }

@@ -92,9 +92,17 @@ public class EditActivity extends Activity implements View.OnClickListener {
         tvDate.setText(TimeUtil.getTodayString());
         Intent intent = getIntent();
         if (intent.getBundleExtra("editData") != null) {
+            Log.d("EditActivity..", "intentBundle!=null");
             editText.setText(intent.getBundleExtra("editData").getString("calendar"));
             tvDate.setText(intent.getBundleExtra("editData").getString("date"));
             tvTime.setText(intent.getBundleExtra("editData").getString("time"));
+            String ringT=intent.getBundleExtra("editData").getString("ring");
+            if(ringT.equals(""))
+                btnClock.setText("NONE");
+            else {
+                btnClock.setText(RingtoneManager.getRingtone(this, Uri.parse(ringT)).getTitle(this));
+                CalendarInfo.ring=Uri.parse(ringT);
+            }
             int i=intent.getBundleExtra("editData").getInt("isImpor");
            // Log.d("EditActivity........",String.format("%d",i));
             if(i==1)
@@ -157,6 +165,7 @@ public class EditActivity extends Activity implements View.OnClickListener {
                     info.isImportent=2;
                 else
                     info.isImportent=0;
+
                 info = capsulation(info, timestamp);
                 int currentTimestamp = (int) (System.currentTimeMillis() / 1000);
 //                System.out.println(currentTimestamp +"~~~~~~~~~~~~~~"+info.unix_time);
@@ -166,18 +175,24 @@ public class EditActivity extends Activity implements View.OnClickListener {
                 }
                 //
                 String token = info.unix_time + info.calendar+info.isImportent;
-                String nowId = info.unix_time + info.calendar.hashCode() + "";
+                Log.d("EditActivity......token",token);
+                String nowId = info.unix_time + info.calendar.hashCode() +info.isImportent+ "";
+                Log.d("EditActivity....nowId",nowId);
                 queryInfo = dao.queryWithID(nowId);
 //                System.out.println(token + "---" + (info.unix_time + info.calendar.hashCode()));
                 if (queryInfo != null) {
                     String str = queryInfo.unix_time + queryInfo.calendar + queryInfo.isImportent;
+                    Log.d("EditActivity.....str",str);
                     if (str.equals(token)) {
 //                        System.out.println("idTest2:" + str);
                         Toast.makeText(mContext, "已有该日程", Toast.LENGTH_SHORT).show();
                         break;
                     }
                 }
-
+                if(CalendarInfo.ring!=null)
+                    info.ring2=CalendarInfo.ring.toString();
+                else
+                    info.ring2="";
                 dao.add(info);
                 //添加注册闹钟
                 info.ring1=CalendarInfo.ring;
@@ -213,6 +228,12 @@ public class EditActivity extends Activity implements View.OnClickListener {
         setResult(RESULT_CANCELED, new Intent());
         super.onBackPressed();
 
+    }
+
+    @Override
+    protected void onStop() {
+        CalendarInfo.ring=null;
+        super.onStop();
     }
 
     private void doPickRingtone() {
@@ -251,7 +272,7 @@ public class EditActivity extends Activity implements View.OnClickListener {
         if (mRingtoneUri != null) {
             btnClock.setText(RingtoneManager.getRingtone(this, pickedUri).getTitle(this));
         } else {
-            btnClock.setText("none");
+            btnClock.setText("NONE");
         }
     }
 }

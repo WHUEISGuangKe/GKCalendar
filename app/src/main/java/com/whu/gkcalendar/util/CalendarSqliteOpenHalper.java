@@ -20,7 +20,7 @@ public class CalendarSqliteOpenHalper extends SQLiteOpenHelper{
     @Override
     public void onCreate(SQLiteDatabase db) {
         System.out.println("创建数据库~~~~~~~~~");
-        db.execSQL("CREATE TABLE calendar_info(_id integer primary key,year integer,date varchar(20),weekday varchar(20),time varchar(20),isImportent integer,calendar varchar(200),unix_time integer)");
+        db.execSQL("CREATE TABLE calendar_info(_id integer primary key,year integer,date varchar(20),weekday varchar(20),time varchar(20),isImportent integer,calendar varchar(200),unix_time integer,ring varchar(20))");
 
     }
 

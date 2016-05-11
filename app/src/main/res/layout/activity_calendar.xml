@@ -9,6 +9,7 @@
     tools:context=".activity.Calendar">
 
     <LinearLayout
+        android:id="@+id/linearDrawer"
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
@@ -22,6 +23,18 @@
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@android:color/white"
+                    android:textSize="16dp"
+                    android:text="菜单"
+                    android:background="@color/blue"
+                    android:layout_gravity="left"
+                    android:id="@+id/menuBtn"
+                    android:layout_centerVertical="true"
+                    android:layout_alignParentLeft="true"
+                    android:layout_alignParentStart="true" />
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -30,7 +43,8 @@
                     android:text="我的日程"
                     android:textColor="@android:color/white"
                     android:textSize="20sp"
-                    android:textStyle="bold" />
+                    android:textStyle="bold"
+                    android:id="@+id/textView" />
                 <Button
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -39,24 +53,49 @@
                     android:text="添加"
                     android:background="@color/blue"
                     android:layout_gravity="right"
-                    android:layout_alignParentBottom="true"
+                    android:id="@+id/addBtn"
+                    android:layout_alignTop="@+id/menuBtn"
                     android:layout_alignParentRight="true"
-                    android:layout_alignParentEnd="true"
-                    android:id="@+id/addBtn"/>
+                    android:layout_alignParentEnd="true" />
             </RelativeLayout>
         </android.support.v7.widget.Toolbar>
         <include layout="@layout/content_calendar" />
     </LinearLayout>
 
-    <ListView
-        android:id="@+id/drawerList"
+    <LinearLayout
         android:layout_width="200dp"
         android:layout_height="match_parent"
-        android:layout_gravity="start"
-        android:background="@color/white"
-        android:choiceMode="singleChoice"
-        android:divider="@android:color/transparent">
+        android:layout_gravity="left"
+        android:orientation="vertical"
+        android:background="@drawable/drawer">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <ImageView
+                android:id="@+id/iv_login"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/login"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="登录"/>
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="30dp">
 
-    </ListView>
+        </LinearLayout>
+
+        <ListView
+            android:id="@+id/drawerList"
+            android:layout_width="200dp"
+            android:layout_height="match_parent"
+            android:choiceMode="singleChoice"
+            android:divider="@android:color/transparent">
+        </ListView>
+    </LinearLayout>
+
 
 </android.support.v4.widget.DrawerLayout>

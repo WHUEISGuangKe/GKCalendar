@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.whu.gkcalendar">
-
+    <uses-sdk android:minSdkVersion="21"/>
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+
 
     <application
         android:allowBackup="true"
@@ -53,6 +54,10 @@
             android:theme="@style/AppTheme.NoActionBar">
 
         </activity>
+
+        <activity android:name=".activity.LoginActivity"></activity>
+        <activity android:name=".activity.RegistryActivity"></activity>
+
     </application>
 
 </manifest>

@@ -20,6 +20,7 @@ public class CalendarInfo {
     public int _id;
     public static Uri ring= null;//铃声中间变量
     public Uri ring1=null;
+    public String ring2;
 
 
     @Override
