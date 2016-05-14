@@ -11,6 +11,19 @@
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent">
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@android:color/white"
+                android:textSize="16dp"
+                android:text="退后"
+                android:background="@color/blue"
+                android:layout_gravity="left"
+                android:id="@+id/btn_back"
+                android:layout_centerVertical="true"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                />
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -31,10 +44,12 @@
         <TableRow>
             <TextView
                 android:layout_height="wrap_content"
-                android:text="用户名:   "/>
+                android:text="用户名:   "
+                />
             <EditText
                 android:layout_height="wrap_content"
-                android:hint="请设置用户名"/>
+                android:hint="请设置用户名"
+                android:id="@+id/et_register_username"/>
         </TableRow>
 
         <TableRow>
@@ -43,7 +58,8 @@
                 android:text="密码:    "/>
             <EditText
                 android:layout_height="wrap_content"
-                android:hint="请设置密码"/>
+                android:hint="请设置密码"
+                android:id="@+id/et_register_password"/>
         </TableRow>
         <TableRow>
             <TextView
@@ -51,14 +67,17 @@
                 android:text="确认密码："/>
             <EditText
                 android:layout_height="wrap_content"
-                android:hint="请确认密码"/>
+                android:hint="请确认密码"
+                android:id="@+id/et_register_password2"/>
         </TableRow>
 
         <TableRow>
             <Button
                 android:layout_height="wrap_content"
                 android:layout_span="2"
-                android:text="完成" />
+                android:text="完成"
+                android:id="@+id/btn_register"
+                />
         </TableRow>
 
     </TableLayout>

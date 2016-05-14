@@ -3,7 +3,11 @@ package com.whu.gkcalendar.activity;
 import android.app.AlarmManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
+import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.widget.DrawerLayout;
@@ -34,11 +38,12 @@ import com.whu.gkcalendar.bean.CalendarInfo;
 import com.whu.gkcalendar.dao.CalendarInfoDao;
 import com.whu.gkcalendar.util.AlarmUtil;
 import com.whu.gkcalendar.util.TimeUtil;
+import com.whu.gkcalendar.util.UserUtil;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class Calendar extends AppCompatActivity implements ActionSheet.ActionSheetListener, AdapterView.OnItemClickListener{
+public class Calendar extends AppCompatActivity implements ActionSheet.ActionSheetListener, AdapterView.OnItemClickListener {
     private Context mContext = this;
     private CalendarInfoDao dao = null;
     private List<CalendarInfo> infoList = null;
@@ -57,11 +62,37 @@ public class Calendar extends AppCompatActivity implements ActionSheet.ActionShe
 
     //登录按钮
     private ImageView ivLogin;
+    private TextView usernameTV;
+
+    private Handler handle = new Handler(){
+        @Override
+        public void handleMessage(Message msg) {
+            boolean success = (boolean) msg.obj;
+            if (success){
+                refreshDrawer();
+            }
+        }
+    };
+
+    private void refreshDrawer(){
+        if(UserUtil.isLogin){
+            menuList.add("退出登陆");
+            usernameTV.setText(UserUtil.userName);
+        }
+        else {
+            usernameTV.setText("未登录");
+            if (menuList.contains("退出登陆")) {
+                menuList.remove("退出登陆");
+            }
+        }
+    }
 
     @Override
     protected void onResume() {
         super.onResume();
         refreshData();
+        drawerLayout.closeDrawer(Gravity.LEFT);
+        refreshDrawer();
     }
 
     @Override
@@ -69,14 +100,14 @@ public class Calendar extends AppCompatActivity implements ActionSheet.ActionShe
         super.onCreate(savedInstanceState);
 
         Intent outIntent = getIntent();
-        if(outIntent != null){
+        if (outIntent != null) {
             String token = outIntent.getStringExtra("token");
-            if (token != null && token.equals("whu")){ // 校验是否是通过推迟一天打开
+            if (token != null && token.equals("whu")) { // 校验是否是通过推迟一天打开
                 String _id = outIntent.getStringExtra("_id");
-                System.out.println("id:"+_id);
+                System.out.println("id:" + _id);
                 if (_id != null) {
                     CalendarInfo info = dao.queryWithID(_id);
-                    if(info != null) {
+                    if (info != null) {
                         System.out.println(info._id + "----" + info.unix_time);
                         delayDay(info);
                     }
@@ -85,11 +116,13 @@ public class Calendar extends AppCompatActivity implements ActionSheet.ActionShe
         }
         setContentView(R.layout.activity_calendar);
 
-        drawerLayout=(DrawerLayout)findViewById(R.id.drawerLayout);
-        drawerList=(ListView)findViewById(R.id.drawerList);
-        drawerLin=(LinearLayout)findViewById(R.id.linearDrawer);
-        ivLogin=(ImageView)findViewById(R.id.iv_login);
-        menuList=new ArrayList<String>();
+        drawerLayout = (DrawerLayout) findViewById(R.id.drawerLayout);
+        drawerList = (ListView) findViewById(R.id.drawerList);
+        drawerLin = (LinearLayout) findViewById(R.id.linearDrawer);
+        ivLogin = (ImageView) findViewById(R.id.iv_login);
+        usernameTV = (TextView)findViewById(R.id.drawer_username);
+
+        menuList = new ArrayList<String>();
         //左侧菜单栏的配置
         menuList.add("全部事项");
         menuList.add("重要紧急");
@@ -97,14 +130,15 @@ public class Calendar extends AppCompatActivity implements ActionSheet.ActionShe
         menuList.add("紧急不重要");
         menuList.add("日常琐事");
         menuList.add("公共备忘录");
-        arrayAdapter=new ArrayAdapter<String>(this,android.R.layout.simple_list_item_1,menuList);
+
+        arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, menuList);
         drawerList.setAdapter(arrayAdapter);
         drawerList.setOnItemClickListener(this);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         toolbar.setTitle("");
-        addBtn = (Button)findViewById(R.id.addBtn);
-        btnMenu=(Button)findViewById(R.id.menuBtn);
+        addBtn = (Button) findViewById(R.id.addBtn);
+        btnMenu = (Button) findViewById(R.id.menuBtn);
         addBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -121,7 +155,11 @@ public class Calendar extends AppCompatActivity implements ActionSheet.ActionShe
         ivLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent goLogin=new Intent(mContext,LoginActivity.class);
+                if(UserUtil.isLogin) {
+                    Toast.makeText(mContext, "已登陆！", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                Intent goLogin = new Intent(mContext, LoginActivity.class);
                 startActivity(goLogin);
 
             }
@@ -132,7 +170,7 @@ public class Calendar extends AppCompatActivity implements ActionSheet.ActionShe
 //        testDB(dao);
         int timestamp = (int) (System.currentTimeMillis() / 1000) - 5;
 //        System.out.println("timestamp：~~~"+timestamp);
-        List list = dao.query(timestamp + "",-1); // test
+        List list = dao.query(timestamp + "", -1); // test
         infoList = list;
 
 //        testQuery(dao);
@@ -170,7 +208,7 @@ public class Calendar extends AppCompatActivity implements ActionSheet.ActionShe
             public boolean onMenuItemClick(int position, SwipeMenu menu, int index) {
                 CalendarInfo info = infoList.get(position);
                 dao.delete(info);
-                AlarmUtil.cancelAlarm(mContext, info._id,info.ring2);
+                AlarmUtil.cancelAlarm(mContext, info._id, info.ring2);
                 refreshData();
                 return false;
             }
@@ -200,15 +238,14 @@ public class Calendar extends AppCompatActivity implements ActionSheet.ActionShe
 //    }
 
 
-
-    private void delayDay(CalendarInfo info){
+    private void delayDay(CalendarInfo info) {
         int tomorrow = info.unix_time + 3600 * 24;
         info.unix_time = tomorrow;
         String dateStr = TimeUtil.getDateStringFromUnix(tomorrow);
         String[] dates = dateStr.split(":");
         info.year = Integer.valueOf(dates[0]);
         String date = dates[1];
-        if (date.substring(0,1).equals("0")){
+        if (date.substring(0, 1).equals("0")) {
             date = date.substring(1);
         }
         info.date = date;
@@ -217,7 +254,7 @@ public class Calendar extends AppCompatActivity implements ActionSheet.ActionShe
         dao.update("date", info);
         dao.update("unix_time", info);
         dao.update("weekday", info);
-        AlarmUtil.cancelAlarm(mContext, info._id,info.ring2);
+        AlarmUtil.cancelAlarm(mContext, info._id, info.ring2);
         AlarmUtil.registerAlarm(mContext, info);
         refreshData();
     }
@@ -241,37 +278,38 @@ public class Calendar extends AppCompatActivity implements ActionSheet.ActionShe
     }
 
     private void testQuery(CalendarInfoDao dao) {
-        List<CalendarInfo> list = dao.query("1460440800",-1);
+        List<CalendarInfo> list = dao.query("1460440800", -1);
 
         for (CalendarInfo info : list) {
             System.out.println(info.calendar);
         }
     }
 
-    private void refreshData(){
+    private void refreshData() {
         int timestamp = (int) (System.currentTimeMillis() / 1000) - 5;
-        infoList = dao.query("" + timestamp,-1);
-        CalendarAdapter adapter = new CalendarAdapter(mContext, infoList);
-        listView.setAdapter(adapter);
-    }
-    private void divide(int imporDegree){
-        int timestamp = (int) (System.currentTimeMillis() / 1000) - 5;
-        infoList = dao.query("" + timestamp,imporDegree);
+        infoList = dao.query("" + timestamp, -1);
         CalendarAdapter adapter = new CalendarAdapter(mContext, infoList);
         listView.setAdapter(adapter);
     }
 
-    private void editData(CalendarInfo info){
-        Intent intent=new Intent(mContext,EditActivity.class);
-        String strCalendar=info.calendar,strDate=info.date,strTime=info.time,strYear=String.valueOf(info.year);
-        int isImpor=info.isImportent;
-        Bundle bundle=new Bundle();
-        bundle.putString("calendar",strCalendar);
-       // bundle.putString("year",strYear);
+    private void divide(int imporDegree) {
+        int timestamp = (int) (System.currentTimeMillis() / 1000) - 5;
+        infoList = dao.query("" + timestamp, imporDegree);
+        CalendarAdapter adapter = new CalendarAdapter(mContext, infoList);
+        listView.setAdapter(adapter);
+    }
+
+    private void editData(CalendarInfo info) {
+        Intent intent = new Intent(mContext, EditActivity.class);
+        String strCalendar = info.calendar, strDate = info.date, strTime = info.time, strYear = String.valueOf(info.year);
+        int isImpor = info.isImportent;
+        Bundle bundle = new Bundle();
+        bundle.putString("calendar", strCalendar);
+        // bundle.putString("year",strYear);
         bundle.putString("date", strYear + "-" + strDate);
         bundle.putString("time", strTime);
-        bundle.putString("ring",info.ring2);
-        bundle.putInt("isImpor",isImpor);
+        bundle.putString("ring", info.ring2);
+        bundle.putInt("isImpor", isImpor);
         intent.putExtra("editData", bundle);
         startActivityForResult(intent, 1);
     }
@@ -279,14 +317,14 @@ public class Calendar extends AppCompatActivity implements ActionSheet.ActionShe
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-       // super.onActivityResult(requestCode, resultCode, data);
+        // super.onActivityResult(requestCode, resultCode, data);
 
-        switch (requestCode){
+        switch (requestCode) {
             case 1:
-                if(resultCode==RESULT_OK) {
+                if (resultCode == RESULT_OK) {
                     CalendarInfo info = infoList.get(position);
                     dao.delete(info);
-                    AlarmUtil.cancelAlarm(mContext, info._id,info.ring2);
+                    AlarmUtil.cancelAlarm(mContext, info._id, info.ring2);
                 }
                 break;
         }
@@ -300,7 +338,7 @@ public class Calendar extends AppCompatActivity implements ActionSheet.ActionShe
     @Override
     public void onOtherButtonClick(ActionSheet actionSheet, int index) {
         CalendarInfo info = infoList.get(position);
-        switch (index){
+        switch (index) {
             case 0: // 编辑
                 editData(info);
                 break;
@@ -314,7 +352,7 @@ public class Calendar extends AppCompatActivity implements ActionSheet.ActionShe
                 break;
             case 3: // 设为已结束(暂定删除)
                 dao.delete(info);
-                AlarmUtil.cancelAlarm(mContext, info._id,info.ring2);
+                AlarmUtil.cancelAlarm(mContext, info._id, info.ring2);
                 refreshData();
                 break;
         }
@@ -323,19 +361,18 @@ public class Calendar extends AppCompatActivity implements ActionSheet.ActionShe
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
-        int importDegree=0;
-        if (parent==calendarList) {
+        int importDegree = 0;
+        if (parent == calendarList) {
             this.position = position;
             ActionSheet.createBuilder(this, getSupportFragmentManager())
                     .setCancelButtonTitle("取消")
                     .setOtherButtonTitles("编辑", "标为紧急重要", "推后一天", "设为已结束")
                     .setCancelableOnTouchOutside(true)
                     .setListener(this).show();
-        }
-        else if (parent == drawerList) {
-            switch (position){
+        } else if (parent == drawerList) {
+            switch (position) {
                 case 0://全部
-                    importDegree=0;
+                    importDegree = 0;
                     divide(-1);
                     break;
                 case 1://重要紧急
@@ -349,6 +386,37 @@ public class Calendar extends AppCompatActivity implements ActionSheet.ActionShe
                     break;
                 case 4://琐事
                     divide(0);
+                    break;
+
+                case 5: // 公共备忘
+                    if (!UserUtil.isLogin){
+                        Toast.makeText(mContext, "请先登陆", Toast.LENGTH_SHORT);
+                        Intent goLogin = new Intent(mContext, LoginActivity.class);
+                        startActivity(goLogin);
+                    }else {
+
+                    }
+
+
+                    break;
+                case 6: // 退出登陆
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(mContext);
+
+                            String username = sharedPreferences.getString("username", "");
+                            String token = sharedPreferences.getString("token", "");
+                            UserUtil.isLogin = false;
+                            UserUtil.currentToken = "";
+                            boolean success = UserUtil.logout(username, token);
+
+                            Message msg = Message.obtain();
+                            msg.obj = success;
+                            handle.sendMessage(msg);
+
+                        }
+                    }).start();
                     break;
                 default:
                     break;
