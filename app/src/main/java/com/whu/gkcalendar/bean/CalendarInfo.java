@@ -18,8 +18,8 @@ public class CalendarInfo {
     public int isImportent; // 0：琐事 1：紧急不重要 2：重要不紧急 3：紧急重要
     public int unix_time;
     public int _id;
-    public static Uri ring= null;//铃声中间变量
-    public Uri ring1=null;
+    public static Uri ring = null;//铃声中间变量
+    public Uri ring1 = null;
     public String ring2;
 
 

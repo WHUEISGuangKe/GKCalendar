@@ -62,9 +62,18 @@ public class TimeUtil {
         return str;
     }
 
-    public static int getUnixTimestamp(){
+    public static String getDateString(int unixstamp){
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd#HH:mm");
+        long stamp = (long) unixstamp;
+        Date date = new Date(stamp * 1000);
+        return format.format(date);
+    }
 
-        return 0;
+    public static String getWeekDayFromUnix(int timestamp){
+        Date date = new Date(((long)timestamp)* 1000);
+        SimpleDateFormat format = new SimpleDateFormat("E");
+        String str = format.format(date);
+        return str;
     }
 }
 

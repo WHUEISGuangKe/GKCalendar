@@ -80,7 +80,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="选择事件类别"
-            android:layout_weight="1"/>
+            android:layout_weight="1" />
         <CheckBox
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

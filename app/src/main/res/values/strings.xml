@@ -3,4 +3,6 @@
     <string name="action_settings">Settings</string>
     <string name="title_activity_alarm_activiy">AlarmActiviy</string>
     <string name="title_activity_welcome">WelcomeActivity</string>
+    <string name="addMem">请输入新成员用户名：</string>
+    <string name="createCal">输入该日程标题</string>
 </resources>
