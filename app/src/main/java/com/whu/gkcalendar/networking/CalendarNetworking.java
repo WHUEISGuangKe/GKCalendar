@@ -21,7 +21,7 @@ import java.util.Map;
  * Created by wwhisdavid on 16/5/14.
  */
 public class CalendarNetworking {
-    private static final String HOST = "http://10.133.182.57:8080";
+    private static final String HOST = NetworkManager.HOST;
     private static final String FETCH_LIST_URL = HOST + "/GKCalendarServer/calendar_query";
     private static final String ALTER_URL = HOST + "/GKCalendarServer/calendar_alter";
     private static final String ADD_URL = HOST + "/GKCalendarServer/calendar_addMember";

@@ -26,7 +26,7 @@ import java.util.Map;
  * Created by wwhisdavid on 16/5/13.
  */
 public class UserUtil {
-    private static final String HOST = "http://10.133.182.57:8080";
+    private static final String HOST = NetworkManager.HOST;
     private static final String LOGIN_URL = HOST + "/GKCalendarServer/user_login";
     private static final String REGISTER_URL = HOST + "/GKCalendarServer/user_register";
     private static final String LOGOUT_URL = HOST + "/GKCalendarServer/user_logout";
