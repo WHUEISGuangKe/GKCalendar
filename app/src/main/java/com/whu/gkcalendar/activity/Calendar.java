@@ -511,6 +511,7 @@ public class Calendar extends AppCompatActivity implements ActionSheet.ActionShe
                         } else {
                             activityType = 1;
                             refreshData(activityType);
+                            drawerLayout.closeDrawer(Gravity.LEFT);
                         }
 
 
@@ -558,6 +559,7 @@ public class Calendar extends AppCompatActivity implements ActionSheet.ActionShe
                         } else {
                             activityType = 1;
                             refreshData(activityType);
+                            drawerLayout.closeDrawer(Gravity.LEFT);
                         }
 
 

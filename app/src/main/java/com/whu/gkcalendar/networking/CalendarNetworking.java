@@ -11,6 +11,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -177,14 +178,14 @@ public class CalendarNetworking {
 
     // http://localhost:8080/GKCalendarServer/calendar_create?
     // username=root&calendar_name=helloworld&date=198198198&content=hellowworld!&token=3506402
-    public static boolean createCalendar(String username, String title, int unixstamp, String content, String token){
+    public static boolean createCalendar(String username, String title, int unixstamp, String content, String token) throws UnsupportedEncodingException {
         Map<String, Object> params = new HashMap();
 
         params.put("username", username);
         params.put("date", unixstamp);
         params.put("calendar_name", title);
         params.put("token", token);
-        params.put("content", content);
+        params.put("content", new String(content.getBytes("ISO8859-1"), "UTF-8"));
 
         HttpURLConnection connection = NetworkManager.requestPost(params, CREATE_URL);
 
