@@ -36,12 +36,12 @@ public class NetworkManager {
             for (Map.Entry<String, Object> entry : entries) {
                 String paramName = entry.getKey();
                 String paramValue = (entry.getValue() + "");
-                String encodeStr = new String(paramValue.getBytes("ISO8859-1"), "UTF-8");
+//                String encodeStr = new String(paramValue.getBytes("ISO8859-1"), "UTF-8");
                 if (!flag) {
-                    content += paramName + "=" + URLEncoder.encode(encodeStr, "UTF-8");
+                    content += paramName + "=" + URLEncoder.encode(paramValue, "UTF-8");
                     flag = true;
                 } else
-                    content += "&" + paramName + "=" + URLEncoder.encode(encodeStr, "UTF-8");
+                    content += "&" + paramName + "=" + URLEncoder.encode(paramValue, "UTF-8");
             }
 
             Log.i("params", content.toString());
