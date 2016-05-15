@@ -32,6 +32,7 @@ import com.whu.gkcalendar.util.CaledarUpdateManager;
 import com.whu.gkcalendar.util.TimeUtil;
 import com.whu.gkcalendar.util.UserUtil;
 
+import java.io.UnsupportedEncodingException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -388,7 +389,12 @@ public class EditActivity extends Activity implements View.OnClickListener {
                             new Thread(new Runnable() {
                                 @Override
                                 public void run() {
-                                    boolean success = CalendarNetworking.createCalendar(UserUtil.userName, info.title, info.unixstamp, info.content, UserUtil.currentToken);
+                                    boolean success = false;
+                                    try {
+                                        success = CalendarNetworking.createCalendar(UserUtil.userName, info.title, info.unixstamp, info.content, UserUtil.currentToken);
+                                    } catch (UnsupportedEncodingException e) {
+                                        e.printStackTrace();
+                                    }
                                     Message msg = Message.obtain();
                                     msg.obj = success;
                                     createHandle.sendMessage(msg);

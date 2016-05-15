@@ -185,7 +185,7 @@ public class CalendarNetworking {
         params.put("date", unixstamp);
         params.put("calendar_name", title);
         params.put("token", token);
-        params.put("content", new String(content.getBytes("ISO8859-1"), "UTF-8"));
+        params.put("content", content);
 
         HttpURLConnection connection = NetworkManager.requestPost(params, CREATE_URL);
 
