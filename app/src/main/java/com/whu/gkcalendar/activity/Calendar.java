@@ -80,7 +80,9 @@ public class Calendar extends AppCompatActivity implements ActionSheet.ActionShe
         public void handleMessage(Message msg) {
             boolean success = (boolean) msg.obj;
             if (success) {
+                activityType = 0;
                 refreshDrawer();
+                refreshData(activityType);
             }
         }
     };
