@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/GKCalender.iml" filepath="$PROJECT_DIR$/GKCalender.iml" />
+      <module fileurl="file://$PROJECT_DIR$/GKCalendar.iml" filepath="$PROJECT_DIR$/GKCalendar.iml" />
       <module fileurl="file://$PROJECT_DIR$/android-ActionSheet-master/android-ActionSheet-master.iml" filepath="$PROJECT_DIR$/android-ActionSheet-master/android-ActionSheet-master.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
     </modules>
