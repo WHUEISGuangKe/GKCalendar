@@ -13,7 +13,7 @@ import java.util.Set;
  * Created by wwhisdavid on 16/5/14.
  */
 public class NetworkManager {
-    public static final String HOST = "http://10.133.182.57:8080";
+    public static final String HOST = "http://192.168.16.222:8080";
     public static HttpURLConnection requestPost(Map<String, Object> params, String urlString) {
 
         try {
